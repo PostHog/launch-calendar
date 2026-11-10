@@ -6,6 +6,11 @@ Add a launch about **4 weeks before** it ships, as a tentative week. Confirm the
 
 This matches the handbook on [releasing new products](https://posthog.com/handbook/product/releasing-new-products-and-features): marketing and billing need at least two weeks' notice before a major launch, and Developer Marketing wants to hear at the start of a quarter about launches planned for it.
 
+## Get access
+
+- **To see it:** everyone at PostHog can view the calendar. Every Monday digest in Slack links to it; open the link to subscribe.
+- **To add or change launches:** product managers can edit it and share it. Anyone else can ask a product manager, or the calendar's owner, for edit access.
+
 ## Name the event
 
 ```

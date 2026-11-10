@@ -50,4 +50,4 @@ Create the event on the launch calendar itself, never on the user's own calendar
 - Create one event per task or team. One launch is one event.
 - Edit events that aren't on this calendar.
 
-If you can't write to the calendar, the user needs edit access from the calendar's owner.
+If you can't write to the calendar, the user needs edit access. Product managers have it and can share it, so tell the user to ask a product manager or the calendar's owner.
