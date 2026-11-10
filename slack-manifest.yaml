@@ -1,0 +1,20 @@
+# Create the app from this file: api.slack.com/apps > Create New App > From a manifest.
+# The app only posts. It receives no events, so it needs no request URL or signing secret.
+display_information:
+  name: Launch calendar
+  description: Posts product launches and pricing changes from the launch calendar.
+  background_color: "#1d4aff"
+features:
+  bot_user:
+    display_name: Launch calendar
+    always_online: false
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - users:read
+      - users:read.email
+settings:
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

@@ -1,0 +1,24 @@
+name: Keepalive
+
+# HostHog puts idle apps to sleep, which would stop the sync loop. A ping every 6 hours keeps it awake.
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: GET /ping
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: |
+          if [ -z "$APP_URL" ]; then
+            echo "Repo variable APP_URL is not set, skipping."
+            exit 0
+          fi
+          curl -fsS --retry 3 --retry-delay 10 "$APP_URL/ping"
