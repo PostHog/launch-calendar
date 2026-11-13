@@ -25,6 +25,7 @@ const envSchema = z.object({
 
   SLACK_BOT_TOKEN: optional,
   ALERT_CHANNEL_ID: optional,
+  MAINTAINER_EMAIL: optional,
   SLACK_POSTING_ENABLED: flag("false"),
 
   SYNC_INTERVAL_MINUTES: z.coerce.number().positive().default(5),
@@ -42,6 +43,8 @@ export interface Config {
   google?: GoogleCredentials;
   slackBotToken?: string;
   alertChannelId?: string;
+  /** Gets a DM when syncs keep failing. */
+  maintainerEmail?: string;
   slackPostingEnabled: boolean;
   syncIntervalMs: number;
 }
@@ -74,6 +77,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): Config {
     google,
     slackBotToken: env.SLACK_BOT_TOKEN,
     alertChannelId: env.ALERT_CHANNEL_ID,
+    maintainerEmail: env.MAINTAINER_EMAIL,
     slackPostingEnabled: env.SLACK_POSTING_ENABLED,
     syncIntervalMs: env.SYNC_INTERVAL_MINUTES * 60_000,
   };

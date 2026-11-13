@@ -98,5 +98,5 @@ Marketing launch issue: https://github.com/PostHog/marketing/issues/…
 ## What happens next
 
 - Adding, confirming, moving or removing an event posts in Slack, with the old and new dates.
-- When a tentative launch is 7 days away (14 for anything with pricing), a reminder in the same channel mentions the owner and asks them to confirm or move it.
+- When a tentative launch is 7 days away (14 for anything with pricing), a reminder in the same channel mentions the owner and asks them to confirm or move it. Reminders go out on weekday mornings from 09:00 London time.
 - Every Monday at 09:00 London time, a digest lists everything coming up.

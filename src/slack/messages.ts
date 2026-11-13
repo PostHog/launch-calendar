@@ -136,3 +136,15 @@ export function reminderMessage(
   if (links) lines.push(links);
   return lines.join("\n");
 }
+
+export function syncFailingMessage(error: string, failures: number): string {
+  return [
+    `⚠️ The launch calendar can't read Google Calendar: ${failures} syncs in a row failed. Alerts, reminders and the digest won't see new changes until it's fixed.`,
+    `Error: \`${escapeMrkdwn(error).replace(/`/g, "'").slice(0, 200)}\``,
+    "If it says `invalid_grant`, the Google sign-in expired: run `pnpm google:auth` and update `GOOGLE_REFRESH_TOKEN` on HostHog.",
+  ].join("\n");
+}
+
+export function syncRecoveredMessage(): string {
+  return "✅ The launch calendar can read Google Calendar again. Changes made in the meantime are posted now.";
+}

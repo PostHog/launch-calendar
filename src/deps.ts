@@ -1,6 +1,7 @@
 import { WebClient } from "@slack/web-api";
 import type { Config } from "./config.js";
 import { GoogleCalendarSource, createCalendarApi } from "./google/calendar.js";
+import { SyncHealth } from "./health.js";
 import { log } from "./log.js";
 import type { RunnerDeps } from "./runner.js";
 import { WebSlackApi, createPoster } from "./slack/client.js";
@@ -30,5 +31,7 @@ export function createRunnerDeps(config: Config, store: Store): RunnerDeps {
     calendarUrl: config.calendarUrl,
     guideUrl: config.guideUrl,
     howItWorksUrl: config.howItWorksUrl,
+    health: new SyncHealth(),
+    maintainerEmail: config.maintainerEmail,
   };
 }

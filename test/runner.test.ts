@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import request from "supertest";
+import { SyncHealth } from "../src/health.js";
 import { runTick } from "../src/runner.js";
 import { MemoryStore } from "../src/store/memory.js";
 import { londonToday } from "../src/time.js";
@@ -105,5 +106,67 @@ describe("security: invitations from outside the calendar", () => {
 
     expect(poster.posted).toEqual([]);
     expect(await store.getEvent("cal", "invite")).toBeUndefined();
+  });
+});
+
+describe("sync failure alerts", () => {
+  it("DMs the maintainer after 3 failed syncs in a row, once, and again when it recovers", async () => {
+    const calendar = new FakeCalendar();
+    let failing = true;
+    const source = {
+      listChanges: (id: string, token: string | null) =>
+        failing ? Promise.reject(new Error("invalid_grant")) : calendar.listChanges(id, token),
+    };
+    const poster = new FakePoster(true, { "maintainer@example.com": "U7" });
+    const deps = {
+      store: new MemoryStore(),
+      source,
+      poster,
+      calendarId: "cal",
+      channelId: "C1",
+      health: new SyncHealth(),
+      maintainerEmail: "maintainer@example.com",
+    };
+
+    await runTick(deps, NOW);
+    await runTick(deps, NOW);
+    expect(poster.posted).toEqual([]);
+
+    await runTick(deps, NOW);
+    expect(poster.posted).toHaveLength(1);
+    expect(poster.posted[0]?.channel).toBe("U7");
+    expect(poster.posted[0]?.text).toContain("3 syncs in a row failed");
+    expect(poster.posted[0]?.text).toContain("invalid_grant");
+
+    await runTick(deps, NOW);
+    expect(poster.posted).toHaveLength(1);
+
+    failing = false;
+    await runTick(deps, NOW);
+    expect(poster.posted).toHaveLength(2);
+    expect(poster.posted[1]).toMatchObject({ channel: "U7" });
+    expect(poster.posted[1]?.text).toContain("can read Google Calendar again");
+
+    await runTick(deps, NOW);
+    expect(poster.posted).toHaveLength(2);
+  });
+
+  it("falls back to the alert channel without a maintainer, and stays quiet when sync is off", async () => {
+    const poster = new FakePoster();
+    const failingSource = { listChanges: () => Promise.reject(new Error("boom")) };
+    const deps = {
+      store: new MemoryStore(),
+      source: failingSource,
+      poster,
+      calendarId: "cal",
+      channelId: "C1",
+      health: new SyncHealth(),
+    };
+    for (let i = 0; i < 3; i++) await runTick(deps, NOW);
+    expect(poster.posted.map((p) => p.channel)).toEqual(["C1"]);
+
+    const off = { ...deps, source: undefined, health: new SyncHealth(), poster: new FakePoster() };
+    for (let i = 0; i < 5; i++) await runTick(off, NOW);
+    expect(off.poster.posted).toEqual([]);
   });
 });

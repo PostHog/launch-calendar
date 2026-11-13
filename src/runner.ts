@@ -1,9 +1,16 @@
 import { runDigestTick, type DigestResult } from "./digest.js";
 import type { CalendarSource } from "./google/calendar.js";
 import { errorFields, log } from "./log.js";
+import type { SyncHealth } from "./health.js";
 import { runReminders } from "./reminders.js";
 import type { Poster } from "./slack/client.js";
-import { changeMessage, changeOwnerEmail, ownerText } from "./slack/messages.js";
+import {
+  changeMessage,
+  changeOwnerEmail,
+  ownerText,
+  syncFailingMessage,
+  syncRecoveredMessage,
+} from "./slack/messages.js";
 import type { Store } from "./store/store.js";
 import { syncCalendar } from "./sync.js";
 import { londonToday } from "./time.js";
@@ -19,6 +26,10 @@ export interface RunnerDeps {
   guideUrl?: string;
   /** Where the digest's "How it works" link goes, e.g. the handbook page. Defaults to guideUrl. */
   howItWorksUrl?: string;
+  /** Counts failed syncs across ticks, so a persistent failure alerts someone. */
+  health?: SyncHealth;
+  /** Who hears about failed syncs, by DM. Without it, the alert channel does. */
+  maintainerEmail?: string;
 }
 
 export interface TickResult {
@@ -71,16 +82,43 @@ export async function runTick(deps: RunnerDeps, now: Date = new Date()): Promise
       result.syncError = err instanceof Error ? err.message : String(err);
       log.error("sync failed", errorFields(err));
     }
+    await reportHealth(deps, result);
   }
 
   try {
-    result.reminders = await runReminders(deps, today);
+    result.reminders = await runReminders(deps, now);
   } catch (err) {
     log.error("reminders failed", errorFields(err));
   }
 
   result.digest = await runDigestTick(deps, now);
   return result;
+}
+
+/** Tells the maintainer when syncs keep failing, and again when they recover. */
+async function reportHealth(deps: RunnerDeps, result: TickResult): Promise<void> {
+  const health = deps.health;
+  if (!health || result.sync === "off") return;
+  const text =
+    result.sync === "failed"
+      ? health.failed(result.syncError ?? "unknown error")
+        ? syncFailingMessage(health.error, health.failureCount)
+        : null
+      : health.succeeded()
+        ? syncRecoveredMessage()
+        : null;
+  if (!text) return;
+  try {
+    const userId = deps.maintainerEmail
+      ? await deps.poster.userIdByEmail(deps.maintainerEmail)
+      : null;
+    const channel = userId ?? deps.channelId;
+    if (!channel) return;
+    const { posted } = await deps.poster.post(channel, text);
+    if (posted && result.sync === "failed") health.markAlerted();
+  } catch (err) {
+    log.error("health alert failed", errorFields(err));
+  }
 }
 
 /** Runs a tick now and then every `intervalMs`, never two at once. */
