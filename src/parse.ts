@@ -105,6 +105,8 @@ export function descriptionLines(description: string | null | undefined): string
 const URL_PATTERN = /https?:\/\/[^\s<>"')]+/;
 
 const SLACK_CHANNEL_LINE = /^slack(?:\s+channel)?\s*:\s*(.+)$/i;
+const SUMMARY_LINE = /^(?:summary|what changes)\s*:\s*(.+)$/i;
+const MAX_SUMMARY = 200;
 
 /** Known labels read the same in Slack however they were typed in the description. */
 function linkLabel(raw: string): string {
@@ -117,7 +119,7 @@ function linkLabel(raw: string): string {
 export function parseLinks(lines: string[]): LaunchLink[] {
   const links: LaunchLink[] = [];
   for (const line of lines) {
-    if (SLACK_CHANNEL_LINE.test(line)) continue;
+    if (SLACK_CHANNEL_LINE.test(line) || SUMMARY_LINE.test(line)) continue;
     const match = /^([A-Za-z][\w &/-]{0,30}?)\s*:\s*(https?:\/\/\S+)/.exec(line);
     if (!match) continue;
     const url = URL_PATTERN.exec(match[2] ?? "")?.[0];
@@ -132,6 +134,16 @@ export function parseLinks(lines: string[]): LaunchLink[] {
  * (…/archives/C0123ABC) gives its ID, which Slack shows as a clickable channel.
  * A plain "#name" is kept as text.
  */
+/** One sentence on what changes for customers, from a "Summary:" line. */
+export function parseSummary(lines: string[]): string | null {
+  for (const line of lines) {
+    const value = SUMMARY_LINE.exec(line)?.[1]?.trim();
+    if (!value) continue;
+    return value.length > MAX_SUMMARY ? `${value.slice(0, MAX_SUMMARY - 1).trimEnd()}…` : value;
+  }
+  return null;
+}
+
 export function parseSlackChannel(lines: string[]): string | null {
   for (const line of lines) {
     const value = SLACK_CHANNEL_LINE.exec(line)?.[1]?.trim();
@@ -210,6 +222,7 @@ export function parseEvent(raw: calendar_v3.Schema$Event, calendarId: string): P
       htmlLink: raw.htmlLink ?? null,
       links: parseLinks(lines),
       slackChannel: parseSlackChannel(lines),
+      summary: parseSummary(lines),
     },
   };
 }

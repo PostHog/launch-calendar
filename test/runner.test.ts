@@ -63,6 +63,7 @@ describe("web", () => {
       htmlLink: "javascript:alert(1)",
       links: [],
       slackChannel: null,
+      summary: null,
       remindedForStart: null,
     });
     const app = createApp({ store });
@@ -168,5 +169,36 @@ describe("sync failure alerts", () => {
     const off = { ...deps, source: undefined, health: new SyncHealth(), poster: new FakePoster() };
     for (let i = 0; i < 5; i++) await runTick(off, NOW);
     expect(off.poster.posted).toEqual([]);
+  });
+});
+
+describe("calendar page", () => {
+  it("draws the requested month with a bar per launch and links to the next month", async () => {
+    const store = new MemoryStore();
+    await store.upsertEvent({
+      calendarId: "cal",
+      eventId: "ga",
+      name: "Example <product>",
+      status: "tentative",
+      type: "ga",
+      includesPricing: true,
+      startDate: "2026-12-01",
+      endDate: "2026-12-01",
+      ownerEmail: null,
+      htmlLink: "https://calendar.example/ga",
+      links: [],
+      slackChannel: null,
+      summary: null,
+      remindedForStart: null,
+    });
+    const res = await request(createApp({ store })).get("/?month=2026-12");
+    expect(res.status).toBe(200);
+    expect(res.text).toContain("<h1>December 2026</h1>");
+    expect(res.text).toContain('href="/?month=2027-01"');
+    expect(res.text).toMatch(
+      /class="ev t-pricing tentative" style="grid-column:2 \/ span 1;grid-row:2"/,
+    );
+    expect(res.text).toContain("Example &lt;product&gt;");
+    expect(res.text).not.toContain("Example <product>");
   });
 });

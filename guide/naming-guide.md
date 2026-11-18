@@ -21,7 +21,7 @@ This matches the handbook on [releasing new products](https://posthog.com/handbo
 | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
 | Status | `[Tentative]`                                                                                                                                                                    | The date is confirmed                          |
 | Type   | `Public beta:`, `GA:`, `Pricing:`, `Billing:`, `Deprecation:`, `Marketing launch:`, or `Other:` for anything else. Add `+ Pricing` when it starts charging, like `GA + Pricing:` | Never. Without a type the event shows as Other |
-| Name   | The product or the change, as customers will see it                                                                                                                              | Never                                          |
+| Name   | What changes, not just the product: `Example product free tier decrease`, not `Example product free tier`                                                                        | Never                                          |
 
 Examples:
 
@@ -39,6 +39,7 @@ Examples:
 Avoid:
 
 - **Dashes or other words in front of the type:** `Example product - Grandfathered pricing ends` has no type, so it shows as Other.
+- **Names that only say the product:** `Pricing: Example product free tier` doesn't say what happens to it. Write `Pricing: Example product free tier decrease`, and put the numbers in a `Summary:` line.
 - **Dates in the title:** `GA: Error tracking (24 Nov)`. The event's dates are what count.
 - **One event per team or task:** one launch is one event. Link the details instead.
 - **Invitations:** create the event on the launch calendar itself. Inviting the launch calendar to an event on your own calendar doesn't work: the app ignores invitations, so outsiders can't post through it.
@@ -69,12 +70,14 @@ An event of one day without `[Tentative]` counts as confirmed. An event of sever
 One item per line. The app picks these up:
 
 ```
+Summary: The free tier drops from 5,000 to 2,000 events a month.
 Owner: someone@posthog.com
 Slack channel: https://posthog.slack.com/archives/C0123ABCDEF
 RFC: https://github.com/PostHog/requests-for-comments-internal/pull/…
 Marketing launch issue: https://github.com/PostHog/marketing/issues/…
 ```
 
+- **Summary** is one sentence on what changes for customers. It shows under the launch in Slack, in the digest and on the calendar. Add one to every pricing change. `What changes:` works too.
 - **Owner** is the PM or team lead who answers questions, or the product marketer for a marketing launch. Leave it out when that's you and you created the event. The owner is mentioned in the reminder.
 - **Slack channel** is the launch's own channel, if it has one. Paste the channel's link (in Slack: the channel name → **Copy link**) so it shows as a clickable channel. A plain `#channel-name` works too, but shows as text.
 - **Marketing launch issue** is the launch issue in the marketing repo. `Marketing:` works as a shorter label.

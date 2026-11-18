@@ -1,6 +1,6 @@
 import { formatDay, londonNow, londonToday, weekStart } from "./time.js";
 import { errorFields, log } from "./log.js";
-import { channelText, launchLabel, slackLink, when } from "./slack/messages.js";
+import { channelText, escapeMrkdwn, launchLabel, slackLink, when } from "./slack/messages.js";
 import type { Poster } from "./slack/client.js";
 import type { Store } from "./store/store.js";
 import type { StoredEvent } from "./types.js";
@@ -38,7 +38,9 @@ export function buildDigest(
     for (const week of [...byWeek.keys()].sort()) {
       lines.push("", `*Week of ${formatDay(week)}*`);
       for (const event of byWeek.get(week) ?? [])
-        lines.push(`• ${launchLabel(event)}, ${when(event)}${channelSuffix(event)}`);
+        lines.push(
+          `• ${launchLabel(event)}, ${when(event)}${channelSuffix(event)}${summarySuffix(event)}`,
+        );
     }
   }
   const footer = ["Tentative dates can still move."];
@@ -94,6 +96,12 @@ export async function runDigestTick(
     await deps.store.releaseDigest(week).catch(() => undefined);
     return "failed";
   }
+}
+
+function summarySuffix(event: StoredEvent): string {
+  if (!event.summary) return "";
+  const sentence = /[.!?…]$/.test(event.summary) ? event.summary : `${event.summary}.`;
+  return `. ${escapeMrkdwn(sentence)}`;
 }
 
 function channelSuffix(event: StoredEvent): string {

@@ -74,6 +74,25 @@ describe("digestRange", () => {
   });
 });
 
+describe("digest summaries", () => {
+  it("adds the summary after the date as its own sentence", () => {
+    const text = buildDigest(
+      [
+        stored({
+          eventId: "s",
+          name: "Free tier",
+          startDate: "2026-11-24",
+          endDate: "2026-11-24",
+          status: "confirmed",
+          summary: "Drops to 2,000 events",
+        }),
+      ],
+      "2026-11-16",
+    );
+    expect(text).toContain("*Free tier*, Tue 24 Nov. Drops to 2,000 events.");
+  });
+});
+
 describe("runDigestTick", () => {
   it("posts once per week", async () => {
     const store = new MemoryStore();

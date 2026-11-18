@@ -11,7 +11,7 @@ export const TYPE_LABEL: Record<LaunchType, string> = {
   other: "Other",
 };
 
-const TYPE_EMOJI: Record<LaunchType, string> = {
+export const TYPE_EMOJI: Record<LaunchType, string> = {
   public_beta: "🧪",
   ga: "🚀",
   pricing: "💰",
@@ -103,6 +103,7 @@ export function changeOwnerEmail(change: Change): string | null {
 export function changeMessage(change: Change, owner: string | null): string {
   const event = change.kind === "removed" ? change.before : change.event;
   const lines = [headline(change)];
+  if (event.summary) lines.push(escapeMrkdwn(event.summary));
   const people = peopleLine(owner, event);
   if (people) lines.push(people);
   const links = change.kind === "removed" ? null : linksLine(event);
@@ -123,6 +124,7 @@ export function reminderMessage(
     `👋 ${owner ? `${owner}, ` : ""}${launchLabel(event)} is planned for ${formatRange(event.startDate, event.endDate)} and is still tentative on the launch calendar.`,
     "If the date is set, remove [Tentative] from the title and make it a single day. If it's moving, update the dates so everyone sees the change.",
   ];
+  if (event.summary) lines.splice(1, 0, escapeMrkdwn(event.summary));
   if (changesPricing(event)) {
     lines.push(
       "Pricing changes need at least 10 business days' notice for sales before customer emails.",

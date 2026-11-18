@@ -82,3 +82,12 @@ describe("reminderMessage", () => {
     expect(text).toContain("\nLaunch channel: <#C0123ABCDEF>\n");
   });
 });
+
+describe("summaries", () => {
+  it("shows the summary under the headline in alerts and reminders, escaped", () => {
+    const event = launch({ summary: "Free tier drops <from> 5,000 to 2,000 events." });
+    const alert = changeMessage({ kind: "added", event }, null).split("\n");
+    expect(alert[1]).toBe("Free tier drops &lt;from&gt; 5,000 to 2,000 events.");
+    expect(reminderMessage(event, null).split("\n")[1]).toBe(alert[1]);
+  });
+});

@@ -16,7 +16,8 @@ The **Product and pricing launches** Google Calendar tells the whole company wha
 2. **Collect the details.** Ask for anything missing. Never guess a date.
    - Type: public beta, GA, pricing, billing, deprecation, marketing launch, or other. Use marketing launch only when marketing launches on a different day from the release; otherwise one event covers both
    - Whether it starts charging. If so, add `+ Pricing` to the type (`GA + Pricing: Example product`), and add a separate `Pricing:` event for the day grandfathered customers start paying
-   - Name, as customers will see it
+   - Name: what changes, not just the product, e.g. `Example product free tier decrease`, not `Example product free tier`
+   - Summary: one sentence on what changes for customers, with the numbers. Needed for every pricing change
    - The date. If it's confirmed, the day. If it's tentative, ask how precise it is: a target day, a week, or only a month
    - Owner: the PM or team lead who answers questions, or the product marketer for a marketing launch. Default to the user
    - The launch's Slack channel, if it has one. Ask for the channel link so it shows as a clickable channel
@@ -29,7 +30,7 @@ The **Product and pricing launches** Google Calendar tells the whole company wha
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `summary`                | `[Tentative] Type: Name`, or `Type: Name` once confirmed                                                                                                                                                                                                    |
 | `start.date`, `end.date` | All-day dates, and `end.date` is exclusive. Confirmed: the day, ending the next day. Tentative: as precise as the user is: the target day, the week (Monday, ending the following Saturday), or the whole month (the 1st, ending the 1st of the next month) |
-| `description`            | One item per line: `Owner: email`, `Slack channel: channel link`, `RFC: url`, `Marketing launch issue: url`                                                                                                                                                 |
+| `description`            | One item per line: `Summary: one sentence`, `Owner: email`, `Slack channel: channel link`, `RFC: url`, `Marketing launch issue: url`                                                                                                                        |
 | `transparency`           | `transparent`, so subscribers stay free                                                                                                                                                                                                                     |
 | `colorId`                | Public beta `3`, GA `10`, Pricing `6`, Billing `5`, Deprecation `8`, Marketing launch `4`, Other `7`. Anything with `+ Pricing` uses `6`                                                                                                                    |
 

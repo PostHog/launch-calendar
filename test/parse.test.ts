@@ -4,6 +4,7 @@ import {
   parseEvent,
   parseLinks,
   parseSlackChannel,
+  parseSummary,
   parseTitle,
 } from "../src/parse.js";
 
@@ -175,5 +176,27 @@ describe("parseEvent", () => {
         "cal",
       ).kind,
     ).toBe("skipped");
+  });
+});
+
+describe("parseSummary", () => {
+  it("reads a Summary or What changes line and keeps it out of the links", () => {
+    expect(
+      parseSummary([
+        "Owner: a@example.com",
+        "Summary: The free tier drops from 5,000 to 2,000 events.",
+      ]),
+    ).toBe("The free tier drops from 5,000 to 2,000 events.");
+    expect(parseSummary(["What changes: Large events become billable"])).toBe(
+      "Large events become billable",
+    );
+    expect(parseLinks(["Summary: see https://example.com/details"])).toEqual([]);
+    expect(parseSummary(["RFC: https://example.com"])).toBeNull();
+  });
+
+  it("cuts very long summaries", () => {
+    const long = parseSummary([`Summary: ${"word ".repeat(80)}`]) ?? "";
+    expect(long.length).toBeLessThanOrEqual(200);
+    expect(long.endsWith("…")).toBe(true);
   });
 });

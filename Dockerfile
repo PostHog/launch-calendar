@@ -21,6 +21,7 @@ COPY --chown=1000:1000 --from=prod-deps /app/node_modules ./node_modules
 COPY --chown=1000:1000 --from=build /app/dist ./dist
 COPY --chown=1000:1000 migrations ./migrations
 COPY --chown=1000:1000 guide ./guide
+COPY --chown=1000:1000 styles ./styles
 USER 1000
 EXPOSE 3000
 # Migrations run before the server binds the port. exec lets node get SIGTERM.

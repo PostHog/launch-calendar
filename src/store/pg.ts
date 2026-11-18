@@ -40,6 +40,7 @@ interface EventRow {
   html_link: string | null;
   links: LaunchLink[];
   slack_channel: string | null;
+  summary: string | null;
   reminded_for_start: string | null;
 }
 
@@ -58,6 +59,7 @@ function toEvent(row: EventRow): StoredEvent {
     htmlLink: row.html_link,
     links: row.links,
     slackChannel: row.slack_channel,
+    summary: row.summary,
     remindedForStart: row.reminded_for_start,
   };
 }
@@ -100,13 +102,14 @@ export class PgStore implements Store {
   async upsertEvent(e: StoredEvent) {
     await this.pool.query(
       `INSERT INTO launch_events
-         (calendar_id, event_id, name, status, type, start_date, end_date, owner_email, html_link, links, slack_channel, reminded_for_start, includes_pricing)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+         (calendar_id, event_id, name, status, type, start_date, end_date, owner_email, html_link, links, slack_channel, reminded_for_start, includes_pricing, summary)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
        ON CONFLICT (calendar_id, event_id) DO UPDATE SET
          name = EXCLUDED.name, status = EXCLUDED.status, type = EXCLUDED.type,
          start_date = EXCLUDED.start_date, end_date = EXCLUDED.end_date,
          owner_email = EXCLUDED.owner_email, html_link = EXCLUDED.html_link, links = EXCLUDED.links,
          slack_channel = EXCLUDED.slack_channel, includes_pricing = EXCLUDED.includes_pricing,
+         summary = EXCLUDED.summary,
          reminded_for_start = EXCLUDED.reminded_for_start, updated_at = now()`,
       [
         e.calendarId,
@@ -122,6 +125,7 @@ export class PgStore implements Store {
         e.slackChannel,
         e.remindedForStart,
         e.includesPricing,
+        e.summary,
       ],
     );
   }

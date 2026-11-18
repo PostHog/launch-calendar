@@ -36,6 +36,8 @@ export interface LaunchEvent {
   links: LaunchLink[];
   /** The launch's Slack channel: a channel ID like "C0123ABC", or "#name" when only the name was given. */
   slackChannel: string | null;
+  /** One sentence on what changes for customers, from a "Summary:" line. */
+  summary: string | null;
 }
 
 export interface StoredEvent extends LaunchEvent {

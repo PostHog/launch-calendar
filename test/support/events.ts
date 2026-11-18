@@ -14,6 +14,7 @@ export function launch(overrides: Partial<LaunchEvent> = {}): LaunchEvent {
     htmlLink: "https://calendar.example/e1",
     links: [],
     slackChannel: null,
+    summary: null,
     ...overrides,
   };
 }

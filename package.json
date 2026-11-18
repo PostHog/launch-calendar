@@ -18,7 +18,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "sync:quill": "tsx scripts/sync-quill-tokens.ts"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
