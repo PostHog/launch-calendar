@@ -77,7 +77,7 @@ RFC: https://github.com/PostHog/requests-for-comments-internal/pull/…
 Marketing launch issue: https://github.com/PostHog/marketing/issues/…
 ```
 
-- **Summary** is one sentence on what changes for customers. It shows under the launch in Slack, in the digest and on the calendar. Add one to every pricing change. `What changes:` works too.
+- **Summary** is one sentence on what changes for customers. It shows under the launch in Slack alerts and reminders, on the calendar, and in the digest during the launch's month. Add one to every pricing change. `What changes:` works too.
 - **Owner** is the PM or team lead who answers questions, or the product marketer for a marketing launch. Leave it out when that's you and you created the event. The owner is mentioned in the reminder.
 - **Slack channel** is the launch's own channel, if it has one. Paste the channel's link (in Slack: the channel name → **Copy link**) so it shows as a clickable channel. A plain `#channel-name` works too, but shows as text.
 - **Marketing launch issue** is the launch issue in the marketing repo. `Marketing:` works as a shorter label.
@@ -102,4 +102,4 @@ Marketing launch issue: https://github.com/PostHog/marketing/issues/…
 
 - Adding, confirming, moving or removing an event posts in Slack, with the old and new dates.
 - When a tentative launch is 7 days away (14 for anything with pricing), a reminder in the same channel mentions the owner and asks them to confirm or move it. Reminders go out on weekdays between 09:00 and 17:00 London time.
-- Every Monday at 09:00 London time, a digest lists everything coming up.
+- Every Monday at 09:00 London time, a digest lists this month's and next month's launches, with a count of later ones.

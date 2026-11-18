@@ -17,6 +17,7 @@ try {
   const text = buildDigest(events, today, {
     calendarUrl: config.calendarUrl,
     howItWorksUrl: config.howItWorksUrl ?? config.guideUrl,
+    appUrl: config.appUrl,
   });
   console.log(text);
   if (process.argv.includes("--post")) {

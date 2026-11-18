@@ -36,6 +36,8 @@ export interface Config {
   port: number;
   calendarId?: string;
   calendarUrl?: string;
+  /** The app's base URL, without a trailing slash. Unset locally, since Slack can't open localhost. */
+  appUrl?: string;
   /** The app's /guide page. Only set when APP_BASE_URL is, since Slack can't open localhost. */
   guideUrl?: string;
   /** The digest's "How it works" link. Falls back to guideUrl. */
@@ -67,12 +69,14 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): Config {
       refreshToken: env.GOOGLE_REFRESH_TOKEN,
     };
   }
+  const appUrl = env.APP_BASE_URL?.replace(/\/+$/, "");
   return {
     databaseUrl: env.DATABASE_URL,
     port: env.PORT,
     calendarId: env.LAUNCH_CALENDAR_ID,
     calendarUrl: env.CALENDAR_URL,
-    guideUrl: env.APP_BASE_URL ? `${env.APP_BASE_URL.replace(/\/+$/, "")}/guide` : undefined,
+    appUrl,
+    guideUrl: appUrl ? `${appUrl}/guide` : undefined,
     howItWorksUrl: env.HOW_IT_WORKS_URL,
     google,
     slackBotToken: env.SLACK_BOT_TOKEN,

@@ -29,6 +29,7 @@ export function createRunnerDeps(config: Config, store: Store): RunnerDeps {
     calendarId: config.calendarId,
     channelId: config.alertChannelId,
     calendarUrl: config.calendarUrl,
+    appUrl: config.appUrl,
     guideUrl: config.guideUrl,
     howItWorksUrl: config.howItWorksUrl,
     health: new SyncHealth(),

@@ -5,7 +5,7 @@ One Google Calendar for product launches, pricing changes and billing changes, s
 Google Calendar is the source of truth: subscribe to it, or edit it like any other calendar. This app watches it and:
 
 - posts to Slack when a launch is added, confirmed, moved, made tentative again or removed, showing old and new dates
-- posts a digest every Monday at 09:00 London time with every upcoming launch
+- posts a digest every Monday at 09:00 London time with this month's and next month's launches
 - posts a reminder that mentions the owner when a tentative launch is close and still not confirmed (7 days ahead, 14 for pricing changes), on weekdays between 09:00 and 17:00 London time
 - DMs the maintainer (`MAINTAINER_EMAIL`) when 3 syncs in a row fail, for example after the Google sign-in expires, and again when it recovers
 - shows every upcoming launch at `/`, the naming guide at `/guide` and a digest preview at `/digest`

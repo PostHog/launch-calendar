@@ -1,6 +1,7 @@
-import { formatDay, londonNow, londonToday, weekStart } from "./time.js";
+import { londonNow, londonToday, weekStart } from "./time.js";
 import { errorFields, log } from "./log.js";
-import { channelText, escapeMrkdwn, launchLabel, slackLink, when } from "./slack/messages.js";
+import { monthTitle, shiftMonth } from "./calendar.js";
+import { escapeMrkdwn, slackLink, typeText, when } from "./slack/messages.js";
 import type { Poster } from "./slack/client.js";
 import type { Store } from "./store/store.js";
 import type { StoredEvent } from "./types.js";
@@ -19,38 +20,58 @@ export function digestRange(today: string): { from: string; to: string } {
   return { from: today, to: "9999-12-31" };
 }
 
-/** Pure: the digest text for every launch that ends today or later. */
-export function buildDigest(
-  events: StoredEvent[],
-  today: string,
-  links: { calendarUrl?: string; howItWorksUrl?: string } = {},
-): string {
-  const lines = ["*🚀 Upcoming launches and pricing changes*"];
+export interface DigestLinks {
+  calendarUrl?: string;
+  howItWorksUrl?: string;
+  /** The app's base URL. Each launch name links to its page there. */
+  appUrl?: string;
+}
+
+/**
+ * Pure: the digest text. Launches that start this month (or are already underway) get
+ * their summary, next month's get one line each, and later ones are only counted.
+ */
+export function buildDigest(events: StoredEvent[], today: string, links: DigestLinks = {}): string {
+  const thisMonth = today.slice(0, 7);
+  const nextMonth = shiftMonth(thisMonth, 1);
+  const now = events.filter((e) => e.startDate.slice(0, 7) <= thisMonth);
+  const next = events.filter((e) => e.startDate.slice(0, 7) === nextMonth);
+  const later = events.length - now.length - next.length;
+
+  const lines = ["*🚀 Launches and pricing changes*"];
   if (events.length === 0) {
     lines.push("Nothing upcoming on the launch calendar.");
   } else {
-    const byWeek = new Map<string, StoredEvent[]>();
-    for (const event of events) {
-      // Launches already underway show under this week.
-      const week = weekStart(event.startDate < today ? today : event.startDate);
-      byWeek.set(week, [...(byWeek.get(week) ?? []), event]);
-    }
-    for (const week of [...byWeek.keys()].sort()) {
-      lines.push("", `*Week of ${formatDay(week)}*`);
-      for (const event of byWeek.get(week) ?? [])
-        lines.push(
-          `• ${launchLabel(event)}, ${when(event)}${channelSuffix(event)}${summarySuffix(event)}`,
-        );
-    }
+    lines.push("", `*This month (${monthName(thisMonth)})*`);
+    lines.push(...(now.length ? now.map((e) => item(e, links, true)) : ["Nothing planned."]));
+    lines.push("", `*Next month (${monthName(nextMonth)})*`);
+    lines.push(...(next.length ? next.map((e) => item(e, links, false)) : ["Nothing planned."]));
   }
-  const footer = ["Tentative dates can still move."];
+
+  const footer = [
+    ...(later > 0 ? [`${later} more after ${monthName(nextMonth)} on the launch calendar.`] : []),
+    "Tentative dates can still move.",
+  ];
   const footerLinks = [
     ...(links.calendarUrl ? [slackLink(links.calendarUrl, "Open the launch calendar")] : []),
     ...(links.howItWorksUrl ? [slackLink(links.howItWorksUrl, "How it works")] : []),
   ];
-  if (footerLinks.length) footer.push(footerLinks.join(" · "));
   lines.push("", footer.join(" "));
+  if (footerLinks.length) lines.push(footerLinks.join(" · "));
   return lines.join("\n");
+}
+
+/** "November" */
+function monthName(month: string): string {
+  return monthTitle(month).split(" ")[0] ?? month;
+}
+
+function item(event: StoredEvent, links: DigestLinks, withSummary: boolean): string {
+  const name = links.appUrl
+    ? slackLink(`${links.appUrl}/launches/${encodeURIComponent(event.eventId)}`, event.name)
+    : escapeMrkdwn(event.name);
+  const summary = withSummary ? summarySuffix(event) : "";
+  return `• ${typeText(event)} · *${name}*, ${when(event)}${summary}`;
 }
 
 export interface DigestDeps {
@@ -60,6 +81,7 @@ export interface DigestDeps {
   calendarUrl?: string;
   guideUrl?: string;
   howItWorksUrl?: string;
+  appUrl?: string;
 }
 
 export type DigestResult =
@@ -86,6 +108,7 @@ export async function runDigestTick(
       buildDigest(events, today, {
         calendarUrl: deps.calendarUrl,
         howItWorksUrl: deps.howItWorksUrl ?? deps.guideUrl,
+        appUrl: deps.appUrl,
       }),
     );
     if (ts) await deps.store.setDigestMessageTs(week, ts);
@@ -102,9 +125,4 @@ function summarySuffix(event: StoredEvent): string {
   if (!event.summary) return "";
   const sentence = /[.!?…]$/.test(event.summary) ? event.summary : `${event.summary}.`;
   return `. ${escapeMrkdwn(sentence)}`;
-}
-
-function channelSuffix(event: StoredEvent): string {
-  const channel = channelText(event.slackChannel);
-  return channel ? ` · ${channel}` : "";
 }

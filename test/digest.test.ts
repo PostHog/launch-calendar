@@ -21,35 +21,77 @@ describe("shouldPostDigest", () => {
 });
 
 describe("buildDigest", () => {
-  it("groups launches by week and puts ones already underway in this week", () => {
+  const links = {
+    calendarUrl: "https://calendar.example",
+    howItWorksUrl: "https://app.example/guide",
+    appUrl: "https://app.example",
+  };
+
+  it("lists this month with summaries, next month in one line each, and counts the rest", () => {
     const text = buildDigest(
       [
-        stored({ eventId: "a", name: "Ongoing", startDate: "2026-11-12", endDate: "2026-11-18" }),
+        stored({
+          eventId: "a",
+          name: "Ongoing",
+          startDate: "2026-10-28",
+          endDate: "2026-11-18",
+          summary: "Already underway",
+        }),
         stored({
           eventId: "b",
-          name: "Next week",
+          name: "Late November",
           status: "confirmed",
           type: "ga",
-          startDate: "2026-11-24",
-          endDate: "2026-11-24",
+          startDate: "2026-11-30",
+          endDate: "2026-11-30",
         }),
+        stored({
+          eventId: "c",
+          name: "December",
+          type: "pricing",
+          startDate: "2026-12-07",
+          endDate: "2026-12-11",
+          summary: "Not shown for next month",
+        }),
+        stored({ eventId: "d", startDate: "2027-01-04", endDate: "2027-01-04" }),
+        stored({ eventId: "e", startDate: "2027-02-01", endDate: "2027-02-05" }),
       ],
       "2026-11-16",
-      { calendarUrl: "https://calendar.example", howItWorksUrl: "https://app.example/guide" },
+      links,
     );
     expect(text).toBe(
       [
-        "*🚀 Upcoming launches and pricing changes*",
+        "*🚀 Launches and pricing changes*",
         "",
-        "*Week of Mon 16 Nov*",
-        "• 🧪 Public beta · *Ongoing*, 12–18 Nov (tentative)",
+        "*This month (November)*",
+        "• 🧪 Public beta · *<https://app.example/launches/a|Ongoing>*, 28 Oct – 18 Nov (tentative). Already underway.",
+        "• 🚀 GA · *<https://app.example/launches/b|Late November>*, Mon 30 Nov",
         "",
-        "*Week of Mon 23 Nov*",
-        "• 🚀 GA · *Next week*, Tue 24 Nov",
+        "*Next month (December)*",
+        "• 💰 Pricing change · *<https://app.example/launches/c|December>*, 7–11 Dec (tentative)",
         "",
-        "Tentative dates can still move. <https://calendar.example|Open the launch calendar> · <https://app.example/guide|How it works>",
+        "2 more after December on the launch calendar. Tentative dates can still move.",
+        "<https://calendar.example|Open the launch calendar> · <https://app.example/guide|How it works>",
       ].join("\n"),
     );
+  });
+
+  it("says when a month has nothing planned", () => {
+    const text = buildDigest(
+      [stored({ eventId: "jan", startDate: "2027-01-04", endDate: "2027-01-04" })],
+      "2026-11-16",
+    );
+    expect(text).toContain("*This month (November)*\nNothing planned.");
+    expect(text).toContain("*Next month (December)*\nNothing planned.");
+    expect(text).toContain("1 more after December");
+  });
+
+  it("names next month across the new year and leaves names unlinked without an app URL", () => {
+    const text = buildDigest(
+      [stored({ eventId: "jan", name: "A <b>", startDate: "2027-01-04", endDate: "2027-01-04" })],
+      "2026-12-14",
+    );
+    expect(text).toContain("*Next month (January)*\n• 🧪 Public beta · *A &lt;b&gt;*, Mon 4 Jan");
   });
 
   it("says so when nothing is coming", () => {
@@ -71,25 +113,6 @@ describe("digestRange", () => {
     );
     const ids = (await store.listEvents(digestRange("2026-11-16"))).map((e) => e.eventId);
     expect(ids).toEqual(["ongoing", "jan"]);
-  });
-});
-
-describe("digest summaries", () => {
-  it("adds the summary after the date as its own sentence", () => {
-    const text = buildDigest(
-      [
-        stored({
-          eventId: "s",
-          name: "Free tier",
-          startDate: "2026-11-24",
-          endDate: "2026-11-24",
-          status: "confirmed",
-          summary: "Drops to 2,000 events",
-        }),
-      ],
-      "2026-11-16",
-    );
-    expect(text).toContain("*Free tier*, Tue 24 Nov. Drops to 2,000 events.");
   });
 });
 

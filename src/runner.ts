@@ -22,6 +22,8 @@ export interface RunnerDeps {
   calendarId: string | undefined;
   channelId: string | undefined;
   calendarUrl?: string;
+  /** The app's base URL. Digest entries link to each launch's page there. */
+  appUrl?: string;
   /** The app's /guide page, linked from reminders and the digest. */
   guideUrl?: string;
   /** Where the digest's "How it works" link goes, e.g. the handbook page. Defaults to guideUrl. */
