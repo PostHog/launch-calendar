@@ -16,16 +16,21 @@ export function safeHref(url: string): string | null {
   return /^https:\/\//i.test(url) ? escapeHtml(url) : null;
 }
 
+/** The app's own page for one launch. */
+export function launchHref(event: StoredEvent): string {
+  return `/launches/${encodeURIComponent(event.eventId)}`;
+}
+
 /** Anything that starts charging takes the pricing color, like on the calendar. */
-function colorType(event: StoredEvent): LaunchType {
+export function colorType(event: StoredEvent): LaunchType {
   return event.includesPricing ? "pricing" : event.type;
 }
 
-function typeLabel(event: StoredEvent): string {
+export function typeLabel(event: StoredEvent): string {
   return (TYPE_LABEL[event.type] ?? event.type) + (event.includesPricing ? " + Pricing" : "");
 }
 
-function emoji(event: StoredEvent): string {
+export function emoji(event: StoredEvent): string {
   return TYPE_EMOJI[event.type] + (event.includesPricing ? TYPE_EMOJI.pricing : "");
 }
 
@@ -38,11 +43,8 @@ function describe(event: StoredEvent): string {
 }
 
 function eventLink(event: StoredEvent, inner: string, attrs: string): string {
-  const href = event.htmlLink ? safeHref(event.htmlLink) : null;
   const label = escapeHtml(describe(event));
-  return href
-    ? `<a ${attrs} href="${href}" title="${label}" aria-label="${label}">${inner}</a>`
-    : `<span ${attrs} title="${label}">${inner}</span>`;
+  return `<a ${attrs} href="${launchHref(event)}" title="${label}" aria-label="${label}">${inner}</a>`;
 }
 
 function bar(segment: Segment): string {

@@ -11,7 +11,11 @@ function main(): void {
   pool.on("error", (err) => log.error("postgres pool error", errorFields(err)));
   const store = new PgStore(pool);
 
-  const app = createApp({ store, calendarUrl: config.calendarUrl });
+  const app = createApp({
+    store,
+    calendarId: config.calendarId,
+    calendarUrl: config.calendarUrl,
+  });
   const server = app.listen(config.port, "0.0.0.0", () => {
     log.info("server listening", { port: config.port });
   });
