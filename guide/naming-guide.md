@@ -2,7 +2,7 @@
 
 The **Product and pricing launches** calendar tells the whole company what's shipping and when. Add every public beta, GA, pricing change and billing change that affects what customers pay. Leave minor launches off for now.
 
-Add a launch about **4 weeks before** it ships, as a tentative week. Confirm the exact day about **1 week before**. Pricing changes need a confirmed date at least **10 business days** before customer emails go out.
+Add a launch about **4 weeks before** it ships, as a tentative date. Confirm the exact day about **1 week before**. Pricing changes need a confirmed date at least **10 business days** before customer emails go out.
 
 This matches the handbook on [releasing new products](https://posthog.com/handbook/product/releasing-new-products-and-features): marketing and billing need at least two weeks' notice before a major launch, and Developer Marketing wants to hear at the start of a quarter about launches planned for it.
 
@@ -57,7 +57,7 @@ When existing customers are grandfathered, add a second event for the day they s
 
 ## Set the dates
 
-- **Tentative:** an all-day event across the expected week, Monday to Friday.
+- **Tentative:** add `[Tentative]` to the title, and make the all-day event as long as you're unsure: the target day if you have one, the week, or the whole month if that's all you know.
 - **Confirmed:** a single all-day event on the launch day, without `[Tentative]`.
 - **Date moves:** drag or edit the **same** event. Never delete it and create a new one: Slack would show a removal and a new launch instead of a move.
 - **Cancelled:** delete the event. Slack shows that it was removed.
@@ -98,5 +98,5 @@ Marketing launch issue: https://github.com/PostHog/marketing/issues/…
 ## What happens next
 
 - Adding, confirming, moving or removing an event posts in Slack, with the old and new dates.
-- When a tentative launch is 7 days away (14 for anything with pricing), a reminder in the same channel mentions the owner and asks them to confirm or move it. Reminders go out on weekday mornings from 09:00 London time.
+- When a tentative launch is 7 days away (14 for anything with pricing), a reminder in the same channel mentions the owner and asks them to confirm or move it. Reminders go out on weekdays between 09:00 and 17:00 London time.
 - Every Monday at 09:00 London time, a digest lists everything coming up.

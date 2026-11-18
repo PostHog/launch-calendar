@@ -86,10 +86,13 @@ describe("runReminders", () => {
 });
 
 describe("reminder timing", () => {
-  it("only sends on weekdays from 09:00 London time", () => {
+  it("only sends on weekdays between 09:00 and 17:00 London time", () => {
     expect(isReminderTime(new Date("2026-11-12T00:01:00Z"))).toBe(false); // Thu, just after midnight
     expect(isReminderTime(new Date("2026-11-12T08:59:00Z"))).toBe(false);
     expect(isReminderTime(new Date("2026-11-12T09:00:00Z"))).toBe(true);
+    expect(isReminderTime(new Date("2026-11-12T16:59:00Z"))).toBe(true);
+    expect(isReminderTime(new Date("2026-11-12T17:00:00Z"))).toBe(false);
+    expect(isReminderTime(new Date("2026-11-17T22:46:00Z"))).toBe(false); // a launch added late in the evening
     expect(isReminderTime(new Date("2026-11-14T10:00:00Z"))).toBe(false); // Saturday
     expect(isReminderTime(new Date("2026-06-15T08:30:00Z"))).toBe(true); // 09:30 in London summer time
   });

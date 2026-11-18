@@ -1,12 +1,12 @@
 # Launch calendar
 
-One Google Calendar for product launches, pricing changes and billing changes, so the whole company hears about them early. A tentative window goes on about 4 weeks before launch and is confirmed a week before.
+One Google Calendar for product launches, pricing changes and billing changes, so the whole company hears about them early. A tentative date (a day, week or month) goes on about 4 weeks before launch and is confirmed a week before.
 
 Google Calendar is the source of truth: subscribe to it, or edit it like any other calendar. This app watches it and:
 
 - posts to Slack when a launch is added, confirmed, moved, made tentative again or removed, showing old and new dates
 - posts a digest every Monday at 09:00 London time with every upcoming launch
-- posts a reminder that mentions the owner when a tentative launch is close and still not confirmed (7 days ahead, 14 for pricing changes), on weekday mornings from 09:00 London time
+- posts a reminder that mentions the owner when a tentative launch is close and still not confirmed (7 days ahead, 14 for pricing changes), on weekdays between 09:00 and 17:00 London time
 - DMs the maintainer (`MAINTAINER_EMAIL`) when 3 syncs in a row fail, for example after the Google sign-in expires, and again when it recovers
 - shows every upcoming launch at `/`, the naming guide at `/guide` and a digest preview at `/digest`
 

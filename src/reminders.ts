@@ -5,12 +5,13 @@ import type { Store } from "./store/store.js";
 import { addDays, daysBetween, londonNow, londonToday } from "./time.js";
 import type { StoredEvent } from "./types.js";
 
-/** Reminders go out on weekdays from 09:00 London time, like the digest, not at midnight. */
+/** Reminders go out on weekdays during working hours in London, so none land at night. */
 export const REMINDER_HOUR = 9;
+export const REMINDER_END_HOUR = 17;
 
 export function isReminderTime(now: Date): boolean {
   const london = londonNow(now);
-  return london.weekday <= 5 && london.hour >= REMINDER_HOUR;
+  return london.weekday <= 5 && london.hour >= REMINDER_HOUR && london.hour < REMINDER_END_HOUR;
 }
 
 /** Pricing changes need 10 business days' notice for sales, so their owners hear two weeks out. */
@@ -31,7 +32,7 @@ export function dueReminders(events: StoredEvent[], today: string): StoredEvent[
 /**
  * Posts a reminder in the alert channel for each tentative launch that is close,
  * mentioning its owner. Launch dates are public at PostHog, so this isn't a DM.
- * A reminder that falls due at night or on a weekend waits for the next weekday morning.
+ * A reminder that falls due in the evening, at night or on a weekend waits for the next weekday morning.
  */
 export async function runReminders(
   deps: { store: Store; poster: Poster; channelId: string | undefined; guideUrl?: string },
